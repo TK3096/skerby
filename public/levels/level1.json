@@ -1,0 +1,73 @@
+{
+  "name": "Level 1 (test section)",
+  "worldWidth": 3000,
+  "worldHeight": 540,
+  "blocks": [
+    { "x": 22, "y": 517, "tile": "floorTopLeft" },
+    { "x": 67, "y": 517, "tile": "floorUp" },
+    { "x": 112, "y": 517, "tile": "floorUp" },
+    { "x": 157, "y": 517, "tile": "floorUp" },
+    { "x": 202, "y": 517, "tile": "floorUp" },
+    { "x": 247, "y": 517, "tile": "floorUp" },
+    { "x": 292, "y": 517, "tile": "floorUp" },
+    { "x": 337, "y": 517, "tile": "floorUp" },
+    { "x": 382, "y": 517, "tile": "floorUp" },
+    { "x": 427, "y": 517, "tile": "floorUp" },
+    { "x": 472, "y": 517, "tile": "floorUp" },
+    { "x": 517, "y": 517, "tile": "floorUp" },
+    { "x": 562, "y": 517, "tile": "floorUp" },
+    { "x": 607, "y": 517, "tile": "floorUp" },
+    { "x": 652, "y": 517, "tile": "floorUp" },
+    { "x": 697, "y": 517, "tile": "floorUp" },
+    { "x": 742, "y": 517, "tile": "floorUp" },
+    { "x": 787, "y": 517, "tile": "floorUp" },
+    { "x": 832, "y": 517, "tile": "floorUp" },
+    { "x": 877, "y": 517, "tile": "floorUp" },
+    { "x": 922, "y": 517, "tile": "floorUp" },
+    { "x": 967, "y": 517, "tile": "floorTopRight" },
+
+    { "x": 500, "y": 380, "tile": "floorTopLeft" },
+    { "x": 545, "y": 380, "tile": "floorUp" },
+    { "x": 590, "y": 380, "tile": "floorUp" },
+    { "x": 635, "y": 380, "tile": "floorUp" },
+    { "x": 680, "y": 380, "tile": "floorTopRight" },
+
+    { "x": 1100, "y": 517, "tile": "floorTopLeft" },
+    { "x": 1145, "y": 517, "tile": "floorUp" },
+    { "x": 1190, "y": 517, "tile": "floorUp" },
+    { "x": 1235, "y": 517, "tile": "floorUp" },
+    { "x": 1280, "y": 517, "tile": "floorUp" },
+    { "x": 1325, "y": 517, "tile": "floorUp" },
+    { "x": 1370, "y": 517, "tile": "floorUp" },
+    { "x": 1415, "y": 517, "tile": "floorUp" },
+    { "x": 1460, "y": 517, "tile": "floorUp" },
+    { "x": 1505, "y": 517, "tile": "floorUp" },
+    { "x": 1550, "y": 517, "tile": "floorTopRight" },
+
+    { "x": 900, "y": 280, "tile": "floorTopLeft" },
+    { "x": 945, "y": 280, "tile": "floorUp" },
+    { "x": 990, "y": 280, "tile": "floorUp" },
+    { "x": 1035, "y": 280, "tile": "floorTopRight" }
+  ],
+  "enemies": [
+    { "x": 600, "y": 340, "patrol": "horizontal", "boundStart": 500, "boundEnd": 680 }
+  ],
+  "coins": [
+    { "x": 200, "y": 480 },
+    { "x": 245, "y": 480 },
+    { "x": 290, "y": 480 },
+    { "x": 550, "y": 340 },
+    { "x": 595, "y": 340 }
+  ],
+  "items": [
+    { "x": 400, "y": 480, "type": "health" },
+    { "x": 800, "y": 480, "type": "poison" }
+  ],
+  "warpGates": [
+    { "x": 50, "y": 472, "kind": "start" },
+    { "x": 1500, "y": 472, "kind": "exit" }
+  ],
+  "hints": [
+    { "x": 150, "y": 460, "image": "arrowRight" }
+  ]
+}
