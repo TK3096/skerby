@@ -2,7 +2,12 @@ import Phaser from "phaser";
 import { GAME_WIDTH, GAME_HEIGHT, PLAYER_SPEED, PLAYER_JUMP_VELOCITY, FIREBALL_SPEED } from "../config";
 import { parseLevelData } from "../levels/levelLoader";
 import { PlayerState } from "../entities/PlayerState";
+import { EnemyState, ENEMY_CONTACT_DAMAGE } from "../entities/EnemyState";
 import type { LevelData } from "../levels/types";
+
+interface EnemySprite extends Phaser.Physics.Arcade.Sprite {
+  enemyState: EnemyState;
+}
 
 export class GameScene extends Phaser.Scene {
   private player!: Phaser.Physics.Arcade.Sprite;
@@ -15,7 +20,9 @@ export class GameScene extends Phaser.Scene {
   private jumpKeyReleased = true;
   private attackKey!: Phaser.Input.Keyboard.Key;
   private fireballs!: Phaser.Physics.Arcade.Group;
+  private enemies!: Phaser.Physics.Arcade.Group;
   private attackKeyReleased = true;
+  private isAttacking = false;
 
   constructor() {
     super("GameScene");
@@ -34,6 +41,9 @@ export class GameScene extends Phaser.Scene {
     this.load.image("floorInside", "assets/StateLV1/FloorInside.png");
 
     this.load.image("fireball", "assets/Player/fireball.png");
+    this.load.image("enemyL", "assets/Enemy/EnemyL.png");
+    this.load.image("enemyR", "assets/Enemy/EnemyR.png");
+    this.load.image("enemyY", "assets/Enemy/EnemyY.png");
 
     this.load.text("level1", "levels/level1.json");
   }
@@ -57,8 +67,45 @@ export class GameScene extends Phaser.Scene {
     this.cursors = this.input.keyboard!.createCursorKeys();
     this.attackKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.Z);
 
-    this.fireballs = this.physics.add.group({
-      allowGravity: false,
+    this.fireballs = this.physics.add.group({ allowGravity: false });
+
+    // Enemies
+    this.enemies = this.physics.add.group({ allowGravity: false });
+    for (const enemyData of this.levelData.enemies) {
+      const texture = enemyData.patrol === "vertical" ? "enemyY" : "enemyR";
+      const sprite = this.enemies.create(enemyData.x, enemyData.y, texture) as EnemySprite;
+      sprite.enemyState = new EnemyState(
+        enemyData.x,
+        enemyData.y,
+        enemyData.patrol,
+        enemyData.boundStart,
+        enemyData.boundEnd
+      );
+      (sprite.body as Phaser.Physics.Arcade.Body).setAllowGravity(false);
+    }
+
+    // Player-enemy overlap (continuous damage)
+    this.physics.add.overlap(this.player, this.enemies, (_player, enemy) => {
+      const e = enemy as EnemySprite;
+      if (!e.enemyState.alive) return;
+
+      if (this.isAttacking) {
+        const score = e.enemyState.kill();
+        this.playerState.addScore(score);
+        e.destroy();
+      } else {
+        this.playerState.takeDamage(ENEMY_CONTACT_DAMAGE);
+      }
+    });
+
+    // Fireball-enemy overlap
+    this.physics.add.overlap(this.fireballs, this.enemies, (fireball, enemy) => {
+      const e = enemy as EnemySprite;
+      if (!e.enemyState.alive) return;
+      const score = e.enemyState.kill();
+      this.playerState.addScore(score);
+      e.destroy();
+      (fireball as Phaser.Physics.Arcade.Sprite).destroy();
     });
 
     this.cameras.main.startFollow(this.player, false, 1, 0);
@@ -106,7 +153,7 @@ export class GameScene extends Phaser.Scene {
       this.playerState.land();
     }
 
-    // Jump (with key release check to prevent holding)
+    // Jump
     const jumpPressed = this.cursors.space.isDown || this.cursors.up.isDown;
     if (jumpPressed && this.jumpKeyReleased && this.playerState.canJump()) {
       this.playerState.jump();
@@ -118,12 +165,27 @@ export class GameScene extends Phaser.Scene {
     }
 
     // Attack / fireball
+    this.isAttacking = this.attackKey.isDown;
     if (this.attackKey.isDown && this.attackKeyReleased) {
       this.shootFireball();
       this.attackKeyReleased = false;
     }
     if (this.attackKey.isUp) {
       this.attackKeyReleased = true;
+    }
+
+    // Update enemy patrol
+    for (const enemy of this.enemies.getChildren() as EnemySprite[]) {
+      if (!enemy.active || !enemy.enemyState.alive) continue;
+      const state = enemy.enemyState;
+      if (state.patrol === "horizontal") {
+        const vel = state.update(enemy.x);
+        enemy.setVelocityX(vel);
+        enemy.setTexture(vel > 0 ? "enemyR" : "enemyL");
+      } else {
+        const vel = state.update(enemy.y);
+        enemy.setVelocityY(vel);
+      }
     }
 
     // Despawn fireballs out of camera bounds
