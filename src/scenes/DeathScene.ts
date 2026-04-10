@@ -1,5 +1,6 @@
 import Phaser from "phaser";
 import { GAME_WIDTH, GAME_HEIGHT } from "../config";
+import { ScoreManager } from "../systems/ScoreManager";
 
 export class DeathScene extends Phaser.Scene {
   constructor() {
@@ -15,6 +16,10 @@ export class DeathScene extends Phaser.Scene {
 
     const score = data.score ?? 0;
     const name = data.playerName ?? "Player";
+
+    // Record score
+    const scoreManager = new ScoreManager();
+    scoreManager.recordScore(name, score);
 
     this.add
       .text(GAME_WIDTH / 2, GAME_HEIGHT / 2 - 80, data.won ? "Stage Clear!" : "You Died!", {
