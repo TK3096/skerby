@@ -1,6 +1,11 @@
 import Phaser from "phaser";
 import { GAME_WIDTH, GAME_HEIGHT } from "./config";
+import { MenuScene } from "./scenes/MenuScene";
+import { EnterNameScene } from "./scenes/EnterNameScene";
+import { HowToPlayScene } from "./scenes/HowToPlayScene";
 import { GameScene } from "./scenes/GameScene";
+import { DeathScene } from "./scenes/DeathScene";
+import { HighScoreScene } from "./scenes/HighScoreScene";
 
 new Phaser.Game({
   type: Phaser.AUTO,
@@ -17,5 +22,5 @@ new Phaser.Game({
       debug: false,
     },
   },
-  scene: [GameScene],
+  scene: [MenuScene, EnterNameScene, HowToPlayScene, GameScene, DeathScene, HighScoreScene],
 });

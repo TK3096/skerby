@@ -72,9 +72,18 @@ export class GameScene extends Phaser.Scene {
     this.load.text("level1", "levels/level1.json");
   }
 
+  init(data: { playerName?: string }) {
+    this.playerName = data.playerName ?? "Player";
+  }
+
   create() {
     this.levelData = parseLevelData(this.cache.text.get("level1"));
     this.playerState = new PlayerState();
+    this.facingRight = true;
+    this.jumpKeyReleased = true;
+    this.attackKeyReleased = true;
+    this.isAttacking = false;
+    this.exitGate = null;
 
     // Background (tiled)
     const bg1 = this.add.image(0, -30, "background").setOrigin(0, 0).setDepth(-10);
