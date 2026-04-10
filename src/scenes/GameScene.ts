@@ -1,11 +1,18 @@
 import Phaser from "phaser";
-import { GAME_WIDTH, GAME_HEIGHT, TILE_SIZE, PLAYER_SPEED, PLAYER_JUMP_VELOCITY } from "../config";
+import { GAME_WIDTH, GAME_HEIGHT, PLAYER_SPEED, PLAYER_JUMP_VELOCITY } from "../config";
+import { parseLevelData } from "../levels/levelLoader";
+import { PlayerState } from "../entities/PlayerState";
+import type { LevelData } from "../levels/types";
 
 export class GameScene extends Phaser.Scene {
   private player!: Phaser.Physics.Arcade.Sprite;
   private cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
   private platforms!: Phaser.Physics.Arcade.StaticGroup;
   private facingRight = true;
+  private levelData!: LevelData;
+  private playerState!: PlayerState;
+  private debugText!: Phaser.GameObjects.Text;
+  private jumpKeyReleased = true;
 
   constructor() {
     super("GameScene");
@@ -22,12 +29,19 @@ export class GameScene extends Phaser.Scene {
     this.load.image("floorDownLeft", "assets/StateLV1/FloorDownLeft.png");
     this.load.image("floorDownRight", "assets/StateLV1/FloorDownRight.png");
     this.load.image("floorInside", "assets/StateLV1/FloorInside.png");
+
+    this.load.text("level1", "levels/level1.json");
   }
 
   create() {
+    this.levelData = parseLevelData(this.cache.text.get("level1"));
+    this.playerState = new PlayerState();
+
     this.platforms = this.physics.add.staticGroup();
 
-    this.createTestLevel();
+    for (const block of this.levelData.blocks) {
+      this.platforms.create(block.x, block.y, block.tile);
+    }
 
     this.player = this.physics.add.sprite(100, 300, "player");
     this.player.setCollideWorldBounds(false);
@@ -37,17 +51,29 @@ export class GameScene extends Phaser.Scene {
 
     this.cursors = this.input.keyboard!.createCursorKeys();
 
-    // Camera follows player horizontally
     this.cameras.main.startFollow(this.player, false, 1, 0);
     this.cameras.main.setDeadzone(100, GAME_HEIGHT);
-    this.cameras.main.setBounds(0, 0, 3000, GAME_HEIGHT);
+    this.cameras.main.setBounds(0, 0, this.levelData.worldWidth, GAME_HEIGHT);
 
-    this.physics.world.setBounds(0, 0, 3000, GAME_HEIGHT + 200);
+    this.physics.world.setBounds(0, 0, this.levelData.worldWidth, GAME_HEIGHT + 200);
+
+    // Debug HUD (fixed to camera)
+    this.debugText = this.add
+      .text(10, 10, "", { fontSize: "16px", color: "#ffffff" })
+      .setScrollFactor(0)
+      .setDepth(100);
   }
 
   update() {
-    const onFloor = this.player.body!.blocked.down;
+    if (this.playerState.isDead) return;
 
+    // Fall death
+    if (this.player.y > GAME_HEIGHT + 50) {
+      this.playerState.fallDeath();
+      return;
+    }
+
+    // Movement
     if (this.cursors.left.isDown) {
       this.player.setVelocityX(-PLAYER_SPEED);
       if (this.facingRight) {
@@ -64,40 +90,24 @@ export class GameScene extends Phaser.Scene {
       this.player.setVelocityX(0);
     }
 
-    if ((this.cursors.space.isDown || this.cursors.up.isDown) && onFloor) {
+    // Landing detection
+    const onFloor = this.player.body!.blocked.down;
+    if (onFloor) {
+      this.playerState.land();
+    }
+
+    // Jump (with key release check to prevent holding)
+    const jumpPressed = this.cursors.space.isDown || this.cursors.up.isDown;
+    if (jumpPressed && this.jumpKeyReleased && this.playerState.canJump()) {
+      this.playerState.jump();
       this.player.setVelocityY(PLAYER_JUMP_VELOCITY);
+      this.jumpKeyReleased = false;
     }
-  }
-
-  private createTestLevel() {
-    const groundY = GAME_HEIGHT - TILE_SIZE;
-
-    // Ground platform - a row of floor tiles
-    for (let x = 0; x < 2000; x += TILE_SIZE) {
-      this.platforms.create(x + TILE_SIZE / 2, groundY + TILE_SIZE / 2, "floorUp");
+    if (!jumpPressed) {
+      this.jumpKeyReleased = true;
     }
 
-    // Fill below ground
-    for (let x = 0; x < 2000; x += TILE_SIZE) {
-      this.platforms.create(x + TILE_SIZE / 2, groundY + TILE_SIZE + TILE_SIZE / 2, "floorInside");
-    }
-
-    // Elevated platform
-    for (let x = 400; x < 700; x += TILE_SIZE) {
-      this.platforms.create(x + TILE_SIZE / 2, 350 + TILE_SIZE / 2, "floorUp");
-    }
-
-    // Higher platform
-    for (let x = 800; x < 1000; x += TILE_SIZE) {
-      this.platforms.create(x + TILE_SIZE / 2, 250 + TILE_SIZE / 2, "floorUp");
-    }
-
-    // Gap in ground (stop ground at 2000, resume at 2200)
-    for (let x = 2200; x < 3000; x += TILE_SIZE) {
-      this.platforms.create(x + TILE_SIZE / 2, groundY + TILE_SIZE / 2, "floorUp");
-    }
-    for (let x = 2200; x < 3000; x += TILE_SIZE) {
-      this.platforms.create(x + TILE_SIZE / 2, groundY + TILE_SIZE + TILE_SIZE / 2, "floorInside");
-    }
+    // Debug HUD
+    this.debugText.setText(`HP: ${this.playerState.hp} | Score: ${this.playerState.score}`);
   }
 }
