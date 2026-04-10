@@ -1,5 +1,5 @@
 import Phaser from "phaser";
-import { GAME_WIDTH, GAME_HEIGHT, PLAYER_SPEED, PLAYER_JUMP_VELOCITY } from "../config";
+import { GAME_WIDTH, GAME_HEIGHT, PLAYER_SPEED, PLAYER_JUMP_VELOCITY, FIREBALL_SPEED } from "../config";
 import { parseLevelData } from "../levels/levelLoader";
 import { PlayerState } from "../entities/PlayerState";
 import type { LevelData } from "../levels/types";
@@ -13,6 +13,9 @@ export class GameScene extends Phaser.Scene {
   private playerState!: PlayerState;
   private debugText!: Phaser.GameObjects.Text;
   private jumpKeyReleased = true;
+  private attackKey!: Phaser.Input.Keyboard.Key;
+  private fireballs!: Phaser.Physics.Arcade.Group;
+  private attackKeyReleased = true;
 
   constructor() {
     super("GameScene");
@@ -29,6 +32,8 @@ export class GameScene extends Phaser.Scene {
     this.load.image("floorDownLeft", "assets/StateLV1/FloorDownLeft.png");
     this.load.image("floorDownRight", "assets/StateLV1/FloorDownRight.png");
     this.load.image("floorInside", "assets/StateLV1/FloorInside.png");
+
+    this.load.image("fireball", "assets/Player/fireball.png");
 
     this.load.text("level1", "levels/level1.json");
   }
@@ -50,6 +55,11 @@ export class GameScene extends Phaser.Scene {
     this.physics.add.collider(this.player, this.platforms);
 
     this.cursors = this.input.keyboard!.createCursorKeys();
+    this.attackKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.Z);
+
+    this.fireballs = this.physics.add.group({
+      allowGravity: false,
+    });
 
     this.cameras.main.startFollow(this.player, false, 1, 0);
     this.cameras.main.setDeadzone(100, GAME_HEIGHT);
@@ -107,7 +117,38 @@ export class GameScene extends Phaser.Scene {
       this.jumpKeyReleased = true;
     }
 
+    // Attack / fireball
+    if (this.attackKey.isDown && this.attackKeyReleased) {
+      this.shootFireball();
+      this.attackKeyReleased = false;
+    }
+    if (this.attackKey.isUp) {
+      this.attackKeyReleased = true;
+    }
+
+    // Despawn fireballs out of camera bounds
+    const cam = this.cameras.main;
+    for (const fb of this.fireballs.getChildren() as Phaser.Physics.Arcade.Sprite[]) {
+      if (fb.active && (fb.x < cam.scrollX - 50 || fb.x > cam.scrollX + GAME_WIDTH + 50)) {
+        fb.destroy();
+      }
+    }
+
     // Debug HUD
     this.debugText.setText(`HP: ${this.playerState.hp} | Score: ${this.playerState.score}`);
+  }
+
+  private shootFireball() {
+    const speed = this.facingRight ? FIREBALL_SPEED : -FIREBALL_SPEED;
+    const offsetX = this.facingRight ? 30 : -30;
+    const fb = this.fireballs.create(
+      this.player.x + offsetX,
+      this.player.y,
+      "fireball"
+    ) as Phaser.Physics.Arcade.Sprite;
+    fb.setVelocityX(speed);
+    if (!this.facingRight) {
+      fb.setFlipX(true);
+    }
   }
 }
