@@ -21,7 +21,11 @@ export class GameScene extends Phaser.Scene {
   private facingRight = true;
   private levelData!: LevelData;
   private playerState!: PlayerState;
-  private debugText!: Phaser.GameObjects.Text;
+  private nameText!: Phaser.GameObjects.Text;
+  private scoreText!: Phaser.GameObjects.Text;
+  private hpBarBg!: Phaser.GameObjects.Rectangle;
+  private hpBarFill!: Phaser.GameObjects.Rectangle;
+  private playerName = "Player";
   private jumpKeyReleased = true;
   private attackKey!: Phaser.Input.Keyboard.Key;
   private fireballs!: Phaser.Physics.Arcade.Group;
@@ -155,11 +159,37 @@ export class GameScene extends Phaser.Scene {
 
     this.physics.world.setBounds(0, 0, this.levelData.worldWidth, GAME_HEIGHT + 200);
 
-    // Debug HUD (fixed to camera)
-    this.debugText = this.add
-      .text(10, 10, "", { fontSize: "16px", color: "#ffffff" })
+    // HUD
+    const hudDepth = 100;
+
+    this.nameText = this.add
+      .text(16, 12, this.playerName, { fontSize: "18px", color: "#ffffff", fontStyle: "bold" })
       .setScrollFactor(0)
-      .setDepth(100);
+      .setDepth(hudDepth);
+
+    this.scoreText = this.add
+      .text(GAME_WIDTH - 16, 12, "Score: 0", { fontSize: "18px", color: "#ffffff", fontStyle: "bold", align: "right" })
+      .setOrigin(1, 0)
+      .setScrollFactor(0)
+      .setDepth(hudDepth);
+
+    // HP bar
+    const hpBarX = 16;
+    const hpBarY = 38;
+    const hpBarWidth = 200;
+    const hpBarHeight = 16;
+
+    this.hpBarBg = this.add
+      .rectangle(hpBarX, hpBarY, hpBarWidth, hpBarHeight, 0x333333)
+      .setOrigin(0, 0)
+      .setScrollFactor(0)
+      .setDepth(hudDepth);
+
+    this.hpBarFill = this.add
+      .rectangle(hpBarX, hpBarY, hpBarWidth, hpBarHeight, 0xff69b4)
+      .setOrigin(0, 0)
+      .setScrollFactor(0)
+      .setDepth(hudDepth);
   }
 
   update() {
@@ -237,8 +267,9 @@ export class GameScene extends Phaser.Scene {
       }
     }
 
-    // Debug HUD
-    this.debugText.setText(`HP: ${this.playerState.hp} | Score: ${this.playerState.score}`);
+    // Update HUD
+    this.scoreText.setText(`Score: ${this.playerState.score}`);
+    this.hpBarFill.width = (this.playerState.hp / 100) * 200;
   }
 
   private shootFireball() {
