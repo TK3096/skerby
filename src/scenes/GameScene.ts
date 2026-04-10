@@ -60,12 +60,35 @@ export class GameScene extends Phaser.Scene {
     this.load.image("health", "assets/Items/health.png");
     this.load.image("poison", "assets/Items/poison.png");
 
+    this.load.image("warpGate", "assets/StateLV1/WarpGate.png");
+    this.load.image("arrowLeft", "assets/StateLV1/arrowLeft.png");
+    this.load.image("arrowRight", "assets/StateLV1/arrowRight.png");
+    this.load.image("arrowUp", "assets/StateLV1/arrowUp.png");
+    this.load.image("spacebar", "assets/StateLV1/spacebar.png");
+    this.load.image("Z", "assets/StateLV1/Z.png");
+    this.load.image("background", "assets/Background/bglevel1.png");
+
     this.load.text("level1", "levels/level1.json");
   }
 
   create() {
     this.levelData = parseLevelData(this.cache.text.get("level1"));
     this.playerState = new PlayerState();
+
+    // Background (tiled)
+    const bg1 = this.add.image(0, -30, "background").setOrigin(0, 0).setDepth(-10);
+    this.add.image(bg1.width, -30, "background").setOrigin(0, 0).setDepth(-10);
+    this.add.image(bg1.width * 2, -30, "background").setOrigin(0, 0).setDepth(-10);
+
+    // Warp gates
+    for (const gate of this.levelData.warpGates) {
+      this.add.image(gate.x, gate.y, "warpGate").setDepth(-5);
+    }
+
+    // Hint graphics
+    for (const hint of this.levelData.hints) {
+      this.add.image(hint.x, hint.y, hint.image).setDepth(-5);
+    }
 
     this.platforms = this.physics.add.staticGroup();
 
