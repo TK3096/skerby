@@ -3,10 +3,15 @@ import { GAME_WIDTH, GAME_HEIGHT, PLAYER_SPEED, PLAYER_JUMP_VELOCITY, FIREBALL_S
 import { parseLevelData } from "../levels/levelLoader";
 import { PlayerState } from "../entities/PlayerState";
 import { EnemyState, ENEMY_CONTACT_DAMAGE } from "../entities/EnemyState";
-import type { LevelData } from "../levels/types";
+import { applyCollectibleEffect } from "../entities/collectibles";
+import type { LevelData, ItemType } from "../levels/types";
 
 interface EnemySprite extends Phaser.Physics.Arcade.Sprite {
   enemyState: EnemyState;
+}
+
+interface CollectibleSprite extends Phaser.Physics.Arcade.Sprite {
+  itemType: ItemType;
 }
 
 export class GameScene extends Phaser.Scene {
@@ -23,6 +28,8 @@ export class GameScene extends Phaser.Scene {
   private enemies!: Phaser.Physics.Arcade.Group;
   private attackKeyReleased = true;
   private isAttacking = false;
+  private coins!: Phaser.Physics.Arcade.Group;
+  private items!: Phaser.Physics.Arcade.Group;
 
   constructor() {
     super("GameScene");
@@ -44,6 +51,10 @@ export class GameScene extends Phaser.Scene {
     this.load.image("enemyL", "assets/Enemy/EnemyL.png");
     this.load.image("enemyR", "assets/Enemy/EnemyR.png");
     this.load.image("enemyY", "assets/Enemy/EnemyY.png");
+
+    this.load.image("donut", "assets/Items/donut.png");
+    this.load.image("health", "assets/Items/health.png");
+    this.load.image("poison", "assets/Items/poison.png");
 
     this.load.text("level1", "levels/level1.json");
   }
@@ -96,6 +107,36 @@ export class GameScene extends Phaser.Scene {
       } else {
         this.playerState.takeDamage(ENEMY_CONTACT_DAMAGE);
       }
+    });
+
+    // Coins
+    this.coins = this.physics.add.group({ allowGravity: false });
+    for (const coinData of this.levelData.coins) {
+      const sprite = this.coins.create(coinData.x, coinData.y, "donut") as CollectibleSprite;
+      sprite.itemType = "donut";
+      (sprite.body as Phaser.Physics.Arcade.Body).setAllowGravity(false);
+    }
+
+    // Items
+    this.items = this.physics.add.group({ allowGravity: false });
+    for (const itemData of this.levelData.items) {
+      const sprite = this.items.create(itemData.x, itemData.y, itemData.type) as CollectibleSprite;
+      sprite.itemType = itemData.type;
+      (sprite.body as Phaser.Physics.Arcade.Body).setAllowGravity(false);
+    }
+
+    // Player-coin overlap
+    this.physics.add.overlap(this.player, this.coins, (_player, coin) => {
+      const c = coin as CollectibleSprite;
+      applyCollectibleEffect(c.itemType, this.playerState);
+      c.destroy();
+    });
+
+    // Player-item overlap
+    this.physics.add.overlap(this.player, this.items, (_player, item) => {
+      const i = item as CollectibleSprite;
+      applyCollectibleEffect(i.itemType, this.playerState);
+      i.destroy();
     });
 
     // Fireball-enemy overlap
