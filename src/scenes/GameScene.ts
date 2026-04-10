@@ -34,6 +34,7 @@ export class GameScene extends Phaser.Scene {
   private isAttacking = false;
   private coins!: Phaser.Physics.Arcade.Group;
   private items!: Phaser.Physics.Arcade.Group;
+  private exitGate: { x: number; y: number } | null = null;
 
   constructor() {
     super("GameScene");
@@ -83,6 +84,9 @@ export class GameScene extends Phaser.Scene {
     // Warp gates
     for (const gate of this.levelData.warpGates) {
       this.add.image(gate.x, gate.y, "warpGate").setDepth(-5);
+      if (gate.kind === "exit") {
+        this.exitGate = { x: gate.x, y: gate.y };
+      }
     }
 
     // Hint graphics
@@ -216,12 +220,26 @@ export class GameScene extends Phaser.Scene {
   }
 
   update() {
-    if (this.playerState.isDead) return;
+    if (this.playerState.isDead) {
+      this.scene.start("DeathScene", { score: this.playerState.score, playerName: this.playerName });
+      return;
+    }
 
     // Fall death
     if (this.player.y > GAME_HEIGHT + 50) {
       this.playerState.fallDeath();
+      this.scene.start("DeathScene", { score: this.playerState.score, playerName: this.playerName });
       return;
+    }
+
+    // Win condition: reach exit warp gate
+    if (this.exitGate) {
+      const dx = Math.abs(this.player.x - this.exitGate.x);
+      const dy = Math.abs(this.player.y - this.exitGate.y);
+      if (dx < 40 && dy < 40) {
+        this.scene.start("DeathScene", { score: this.playerState.score, playerName: this.playerName, won: true });
+        return;
+      }
     }
 
     // Movement
