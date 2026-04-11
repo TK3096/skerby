@@ -339,7 +339,7 @@ hints.push(
 
 const level = {
   name: "Level 1",
-  worldWidth: 18200,
+  worldWidth: 20255,
   worldHeight: 540,
   blocks,
   enemies,
