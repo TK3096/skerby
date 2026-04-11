@@ -12,6 +12,7 @@ export class EnemyState {
   boundEnd: number;
   speed: number;
   alive: boolean;
+  private direction: 1 | -1;
 
   constructor(
     x: number,
@@ -27,20 +28,18 @@ export class EnemyState {
     this.boundEnd = boundEnd;
     this.speed = ENEMY_SPEED;
     this.alive = true;
+    const spawnPos = patrol === "horizontal" ? x : y;
+    const mid = (boundStart + boundEnd) / 2;
+    this.direction = spawnPos > mid ? -1 : 1;
   }
 
   update(currentPos: number): number {
     if (!this.alive) return 0;
 
-    if (this.patrol === "horizontal") {
-      if (currentPos <= this.boundStart) return this.speed;
-      if (currentPos >= this.boundEnd) return -this.speed;
-    } else {
-      if (currentPos <= this.boundStart) return this.speed;
-      if (currentPos >= this.boundEnd) return -this.speed;
-    }
+    if (currentPos <= this.boundStart) this.direction = 1;
+    else if (currentPos >= this.boundEnd) this.direction = -1;
 
-    return this.speed; // keep current direction as default
+    return this.speed * this.direction;
   }
 
   kill(): number {

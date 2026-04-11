@@ -1,6 +1,6 @@
 {
   "name": "Level 1",
-  "worldWidth": 18200,
+  "worldWidth": 20255,
   "worldHeight": 540,
   "blocks": [
     {
@@ -1551,6 +1551,116 @@
     {
       "x": 4037.5,
       "y": 202.5,
+      "tile": "floorTopRight"
+    },
+    {
+      "x": 4332.5,
+      "y": 292.5,
+      "tile": "floorTopLeft"
+    },
+    {
+      "x": 4377.5,
+      "y": 292.5,
+      "tile": "floorUp"
+    },
+    {
+      "x": 4422.5,
+      "y": 292.5,
+      "tile": "floorUp"
+    },
+    {
+      "x": 4467.5,
+      "y": 292.5,
+      "tile": "floorUp"
+    },
+    {
+      "x": 4512.5,
+      "y": 292.5,
+      "tile": "floorUp"
+    },
+    {
+      "x": 4557.5,
+      "y": 292.5,
+      "tile": "floorUp"
+    },
+    {
+      "x": 4602.5,
+      "y": 292.5,
+      "tile": "floorUp"
+    },
+    {
+      "x": 4647.5,
+      "y": 292.5,
+      "tile": "floorUp"
+    },
+    {
+      "x": 4692.5,
+      "y": 292.5,
+      "tile": "floorUp"
+    },
+    {
+      "x": 4737.5,
+      "y": 292.5,
+      "tile": "floorUp"
+    },
+    {
+      "x": 4782.5,
+      "y": 292.5,
+      "tile": "floorUp"
+    },
+    {
+      "x": 4827.5,
+      "y": 292.5,
+      "tile": "floorUp"
+    },
+    {
+      "x": 4872.5,
+      "y": 292.5,
+      "tile": "floorTopRight"
+    },
+    {
+      "x": 4422.5,
+      "y": 157.5,
+      "tile": "floorTopLeft"
+    },
+    {
+      "x": 4467.5,
+      "y": 157.5,
+      "tile": "floorUp"
+    },
+    {
+      "x": 4512.5,
+      "y": 157.5,
+      "tile": "floorUp"
+    },
+    {
+      "x": 4557.5,
+      "y": 157.5,
+      "tile": "floorUp"
+    },
+    {
+      "x": 4602.5,
+      "y": 157.5,
+      "tile": "floorUp"
+    },
+    {
+      "x": 4647.5,
+      "y": 157.5,
+      "tile": "floorTopRight"
+    },
+    {
+      "x": 5102.5,
+      "y": 282.5,
+      "tile": "floorTopLeft"
+    },
+    {
+      "x": 5147.5,
+      "y": 282.5,
+      "tile": "floorUp"
+    },
+    {
+      "x": 5192.5,
+      "y": 282.5,
       "tile": "floorTopRight"
     },
     {

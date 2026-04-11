@@ -108,6 +108,7 @@ export class GameScene extends Phaser.Scene {
     for (const block of this.levelData.blocks) {
       this.platforms.create(block.x, block.y, block.tile);
     }
+    this.platforms.refresh();
 
     this.player = this.physics.add.sprite(100, 300, "player");
     this.player.setCollideWorldBounds(false);
