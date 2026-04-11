@@ -8,12 +8,37 @@
 
 import { writeFileSync } from "fs";
 
-interface Block { x: number; y: number; tile: string }
-interface Enemy { x: number; y: number; patrol: string; boundStart: number; boundEnd: number }
-interface Coin { x: number; y: number }
-interface Item { x: number; y: number; type: string }
-interface WarpGate { x: number; y: number; kind: string }
-interface Hint { x: number; y: number; image: string }
+interface Block {
+  x: number;
+  y: number;
+  tile: string;
+}
+interface Enemy {
+  x: number;
+  y: number;
+  patrol: string;
+  boundStart: number;
+  boundEnd: number;
+}
+interface Coin {
+  x: number;
+  y: number;
+}
+interface Item {
+  x: number;
+  y: number;
+  type: string;
+}
+interface WarpGate {
+  x: number;
+  y: number;
+  kind: string;
+}
+interface Hint {
+  x: number;
+  y: number;
+  image: string;
+}
 
 const BOX = 45;
 const blocks: Block[] = [];
@@ -37,7 +62,13 @@ function addRect(startX: number, startY: number, cols: number, rows: number) {
   }
 }
 
-function addAlternating(startX: number, startY: number, totalCols: number, stack: number, space: number) {
+function addAlternating(
+  startX: number,
+  startY: number,
+  totalCols: number,
+  stack: number,
+  space: number,
+) {
   let col = 0;
   while (col < totalCols) {
     for (let s = 0; s < stack && col < totalCols; s++, col++) {
@@ -99,6 +130,12 @@ addRect(2170, 135, 5, 6);
 addRect(2800, 180, 20, 1);
 // #13: small platform
 addRect(3970, 180, 2, 1);
+// #13b: lower walkway for x=4310-4892 coin row (y=220 coins)
+addRect(4310, 270, 13, 1);
+// #13c: upper platform for y=90 coins and y=100-150 items
+addRect(4400, 135, 6, 1);
+// #13d
+addRect(5080, 260, 3, 1);
 // #14
 addRect(5320, 270, 2, 1);
 // #15
@@ -211,13 +248,23 @@ const PATROL_HALF_RANGE = 150; // ~50 ticks × 3px/tick
 
 // Horizontal patrol enemies
 const hEnemies = [
-  [1050, 340], [1750, 340], [3250, 115], [3100, 340], [3500, 340],
-  [4500, 210], [6241, 340], [9620, 158], [9840, 158], [13688, 202],
-  [14432, 337], [16702, 340],
+  [1050, 340],
+  [1750, 340],
+  [3250, 115],
+  [3100, 340],
+  [3500, 340],
+  [4500, 210],
+  [6241, 340],
+  [9620, 158],
+  [9840, 158],
+  [13688, 202],
+  [14432, 337],
+  [16702, 340],
 ];
 for (const [x, y] of hEnemies) {
   enemies.push({
-    x, y,
+    x,
+    y,
     patrol: "horizontal",
     boundStart: x - PATROL_HALF_RANGE,
     boundEnd: x + PATROL_HALF_RANGE,
@@ -226,14 +273,29 @@ for (const [x, y] of hEnemies) {
 
 // Vertical patrol enemies
 const vEnemies = [
-  [480, 30], [800, 40], [1300, 60], [1650, 30], [2500, 30],
-  [4200, 100], [5100, 45], [5540, 55], [6310, 30], [6497, 60],
-  [7598, 100], [8747, 150], [8894, 160], [9034, 150], [9150, 160],
-  [11196, 55], [11508, 30], [16044, 30],
+  [480, 30],
+  [800, 40],
+  [1300, 60],
+  [1650, 30],
+  [2500, 30],
+  [4200, 100],
+  [5100, 45],
+  [5540, 55],
+  [6310, 30],
+  [6497, 60],
+  [7598, 100],
+  [8747, 150],
+  [8894, 160],
+  [9034, 150],
+  [9150, 160],
+  [11196, 55],
+  [11508, 30],
+  [16044, 30],
 ];
 for (const [x, y] of vEnemies) {
   enemies.push({
-    x, y,
+    x,
+    y,
     patrol: "vertical",
     boundStart: y,
     boundEnd: y + 2 * PATROL_HALF_RANGE,
@@ -259,8 +321,11 @@ coins.push({ x: 1950, y: 220 }, { x: 2000, y: 220 });
 addCoins(2200, 80, 3, 50);
 // Stair-like singles
 coins.push(
-  { x: 2400, y: 130 }, { x: 2450, y: 180 }, { x: 2490, y: 230 },
-  { x: 2530, y: 270 }, { x: 2570, y: 320 },
+  { x: 2400, y: 130 },
+  { x: 2450, y: 180 },
+  { x: 2490, y: 230 },
+  { x: 2530, y: 270 },
+  { x: 2570, y: 320 },
 );
 coins.push({ x: 3100, y: 270 }, { x: 3150, y: 270 }, { x: 3200, y: 270 });
 coins.push({ x: 3550, y: 270 }, { x: 3600, y: 270 });
