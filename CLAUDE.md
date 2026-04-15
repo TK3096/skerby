@@ -36,3 +36,27 @@ Game tuning values are centralized in `src/config.ts`: tile size (45px), player 
 ## Testing
 
 Tests are pure unit tests against the logic classes — no Phaser mocking needed. `ScoreManager` tests use a mock `Storage` object injected via constructor.
+
+## Commit Rules
+
+Summarize commit message with clearly. For each commit, you must create github issue on TK3096/second-brain with devlog, side_projects and skerby labels, use gh for create issue. If the commit is about fix/hotfix/fixbug append "hotfix" label, other wise append "feature" label. If labels does not exist on github, create them first.
+
+## Issue Template
+
+use this issue template for second-brain
+
+- **Repo:** `${REPO_NAME}`
+- **Branch:** `${BRANCH}`
+- **Commit:** `${COMMIT_SHORT}`
+- **Author:** ${AUTHOR}
+- **Date:** ${DATE}
+
+## Message
+
+${COMMIT_MSG}
+
+## Files Changed
+
+```
+${FILES_CHANGED}
+```
