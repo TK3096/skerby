@@ -1,5 +1,5 @@
 node_modules/
 dist/
-CLAUDE.local.md
+*.local.md
 .DS_Store
 plans
